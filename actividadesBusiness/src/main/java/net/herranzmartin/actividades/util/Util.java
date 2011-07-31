@@ -1,10 +1,12 @@
-package net.herranzmartin.actividades;
+package net.herranzmartin.actividades.util;
 
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
+
+import nl.bitwalker.useragentutils.UserAgent;
 
 public class Util {
 	
@@ -45,6 +47,17 @@ public class Util {
 		}else if(browser.toUpperCase().indexOf(IE) != -1){ // IE
 			agente = IE;
 		}
+		
+		/**
+		 * 
+		 */
+		UserAgent ua = new UserAgent(browser);
+		logger.info(SEP_VERTICAL);
+		logger.info("Sistema Operativo:" + ua.getOperatingSystem().getName());
+		logger.info("Navegador:" + ua.getBrowser().getName());
+		logger.info("Versión:" + ua.getBrowserVersion());
+		logger.info(SEP_VERTICAL);
+		
 		return agente;
 	}
 	
@@ -112,10 +125,19 @@ public class Util {
 		if(DEBUG)
 			logger.info("param:" + nom_par);
 		if(agente.equals(IE)){
+			
 			str = getIE(request, nom_par);
+			
 		}else if(agente.equals(FIREFOX)){
-			str = getFF(request, nom_par);
+			//str = getFF(request, nom_par);
+			//str = getChromeMac(request, nom_par); // Error para Firefox en Mac
+			
+			//Sorprendentemente para Firefox en MacOSX la combinación es ISO-8859-1, UTF-8
+			str = getIE(request, nom_par);
 		}else{ // Chrome
+			
+			//ISO-8859-1, UTF-8 combinación OK en Chrome for Windows
+			//ISO-8859-1, UTF-8 combinación OK en Chrome for Mac
 			str = getChromeMac(request, nom_par);
 		}
 		if(DEBUG)

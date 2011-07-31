@@ -15,10 +15,10 @@ import javax.persistence.criteria.Expression;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import net.herranzmartin.actividades.Util;
 import net.herranzmartin.actividades.model.Accion;
 import net.herranzmartin.actividades.model.Actividad;
 import net.herranzmartin.actividades.model.Categoria;
+import net.herranzmartin.actividades.util.Util;
 
 
 

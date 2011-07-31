@@ -17,13 +17,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.herranzmartin.actividades.Util;
 import net.herranzmartin.actividades.exceptions.NoSeHaRecibidoOperacionException;
 import net.herranzmartin.actividades.model.Accion;
 import net.herranzmartin.actividades.model.Actividad;
 import net.herranzmartin.actividades.model.Categoria;
 import net.herranzmartin.actividades.model.Respuesta;
 import net.herranzmartin.actividades.services.ActividadService;
+import net.herranzmartin.actividades.util.Util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -109,7 +109,7 @@ public class ActividadesServlet extends HttpServlet {
 				
 			}else{
 			
-			    String op = request.getParameter("op").toString();
+			    String op = Util.getParameterFromBrowser(request, "op");
 			    logger.info("Operación recibida:" + op);
 			    
 			    if("add".equals(op)) {
@@ -272,7 +272,8 @@ public class ActividadesServlet extends HttpServlet {
 
 		// Localizamos las categorías
     	logger.info("acciones:operación delete ");
-    	String id = request.getParameter("id");
+    	//String id = request.getParameter("id");
+    	String id = Util.getParameterFromBrowser(request, "id");
     	logger.info("acciones:operación delete " + id);
     	long idActividad = Long.parseLong(id);
     	logger.info("acciones:operación delete " + idActividad);

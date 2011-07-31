@@ -2,7 +2,6 @@ package net.herranzmartin.actividades.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -14,10 +13,11 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.herranzmartin.actividades.Util;
+import net.herranzmartin.actividades.exceptions.NoSeHaRecibidoOperacionException;
 import net.herranzmartin.actividades.model.Categoria;
 import net.herranzmartin.actividades.model.Respuesta;
 import net.herranzmartin.actividades.services.ActividadService;
+import net.herranzmartin.actividades.util.Util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -27,6 +27,12 @@ import com.google.gson.GsonBuilder;
  */
 public class CategoriasServlet extends HttpServlet {
 
+	private static final String OP_CATEGORIA_NOOP_ERROR = "No ha llegado la operación...!";
+	private static final String OP_CATEGORIA_DEL_ERROR = "Error en la baja de la categoría!";
+	private static final String OP_CATEGORIA_DEL_OK = "Baja de la categoría realizada correctamente!";
+	private static final String OP_CATEGORIA_ADD_ERROR = "Error en el alta de la categoría!";
+	private static final String OP_CATEGORIA_ADD_OK = "Alta de la categoria %s realizada correctamente!";
+	
 	private static final String CATEGORIA_DESCRIPCION = "categoriaDescripcion";
 	private static final String CATEGORIA_NOMBRE = "categoriaNombre";
 
@@ -37,14 +43,13 @@ public class CategoriasServlet extends HttpServlet {
 	private EntityManager em = null;
 	private ActividadService as = null;
 	
-	private static final Logger logger = Logger.getLogger(CategoriasServlet.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(CategoriasServlet.class.getName());
 
 
     /**
      * Default constructor. 
      */
     public CategoriasServlet() {
-        // TODO Auto-generated constructor stub
     }
     
 
@@ -72,60 +77,77 @@ public class CategoriasServlet extends HttpServlet {
 	    em = emf.createEntityManager();
 	    as = new ActividadService(em);
 	    
-	    logger.info("Estamos en getCategorias...");
-	    
-	    String op = request.getParameter("op").toString();
-	    logger.info("Operación recibida:" + op);
-	    
-	    Categoria categoria;
-	    List<Categoria> categorias;
+	    LOGGER.info("Estamos en getCategorias...");
+
 	    String json = "";
+	    
+	    try {
+			if(request.getParameter("op") == null){
+				
+				throw new NoSeHaRecibidoOperacionException(OP_CATEGORIA_NOOP_ERROR);
+				
+			}else{
+			    //String op = request.getParameter("op").toString();
+			    String op = Util.getParameterFromBrowser(request, "op");
+			    LOGGER.info("Operación recibida:" + op);
+			    
+			    Categoria categoria;
+			    List<Categoria> categorias;
 
-	    if("add".equals(op)) {
-	    	
-	    	categoria = altaCategoria(request);
-	    	
-			Respuesta respuesta = new Respuesta();
-			if(categoria != null) {
-				respuesta.setCodigoRespuesta("00");
-				respuesta.setDescRespuesta("Alta de la categoria " + categoria.getId() + " realizada correctamente!");
-			}else {
-				respuesta.setCodigoRespuesta("01");
-				respuesta.setDescRespuesta("Error en el alta de la categoría!");
+			    if("add".equals(op)) {
+			    	
+			    	categoria = altaCategoria(request);
+			    	
+					Respuesta respuesta = new Respuesta();
+					if(categoria != null) {
+						respuesta.setCodigoRespuesta("00");
+						respuesta.setDescRespuesta(String.format(OP_CATEGORIA_ADD_OK, categoria.getId()));
+					}else {
+						respuesta.setCodigoRespuesta("01");
+						respuesta.setDescRespuesta(OP_CATEGORIA_ADD_ERROR);
+					}
+					
+			        json = new Gson().toJson(respuesta);
+
+
+			    	
+			    	
+			    }else if("lista".equals(op)){
+			    	
+			    	categorias = as.listAllCategorias();
+			    	
+			    	LOGGER.info("Se han localizado " + categorias.size() + " categorías!");
+			    	
+			        json = new GsonBuilder().setPrettyPrinting().create().toJson(categorias);
+
+			    	LOGGER.info("Texto que retorna: " + json);
+
+			    }else if("del".equals(op)){
+
+			    	boolean ok = bajaCategoria(request);
+
+					Respuesta respuesta = new Respuesta();
+					if(ok) {
+						respuesta.setCodigoRespuesta("00");
+						respuesta.setDescRespuesta(OP_CATEGORIA_DEL_OK);
+					}else {
+						respuesta.setCodigoRespuesta("01");
+						respuesta.setDescRespuesta(OP_CATEGORIA_DEL_ERROR);
+					}
+			        json = new GsonBuilder().setPrettyPrinting().create().toJson(respuesta);
+			    }
+				
 			}
+		} catch (NoSeHaRecibidoOperacionException e) {
+			Respuesta respuesta = new Respuesta();
+			respuesta.setCodigoRespuesta("02");
+			respuesta.setDescRespuesta(OP_CATEGORIA_NOOP_ERROR);
 			
-	        json = new Gson().toJson(respuesta);
-
-
-	    	
-	    	
-	    }else if("lista".equals(op)){
-	    	
-	    	categorias = as.listAllCategorias();
-	    	
-	    	logger.info("Se han localizado " + categorias.size() + " categorías!");
-	    	
-	        json = new GsonBuilder().setPrettyPrinting().create().toJson(categorias);
-
-	    	logger.info("Texto que retorna: " + json);
-
-	    }else if("del".equals(op)){
-
-	    	boolean ok = bajaCategoria(request);
-
-			Respuesta respuesta = new Respuesta();
-			if(ok) {
-				respuesta.setCodigoRespuesta("00");
-				respuesta.setDescRespuesta("Baja de la categoría realizada correctamente!");
-			}else {
-				respuesta.setCodigoRespuesta("01");
-				respuesta.setDescRespuesta("Error en la baja de la categoría!");
-			}
-	        json = new GsonBuilder().setPrettyPrinting().create().toJson(respuesta);
-	    }
-
-	    PrintWriter out = response.getWriter();
-        out.write(json);
+			json = new Gson().toJson(respuesta);
+		}finally{
+	        PrintWriter out = response.getWriter();
+	        out.write(json);
+		}
 	}
 
 
@@ -133,40 +155,25 @@ public class CategoriasServlet extends HttpServlet {
 
 		em.getTransaction().begin();
 	    
-		logger.info("altaCategoria...");
+		LOGGER.info("altaCategoria...");
 		
 		String nom = "",
 				desc = "";
 		
-		String agente = Util.getBrowser(request);
-
-		logger.info("El usuario usa un navegador tipo " + agente + ':' + request.getHeader("user-agent"));
-
 		try {
 
-			if(agente.equals(Util.FIREFOX)) {
+			nom = Util.getParameterFromBrowser(request, CATEGORIA_NOMBRE);
+			desc = Util.getParameterFromBrowser(request, CATEGORIA_DESCRIPCION);
 
-				nom = new String(request.getParameter( CATEGORIA_NOMBRE ).getBytes(Util.UTF_8), Util.UTF_8);
-				desc = new String(request.getParameter(CATEGORIA_DESCRIPCION).getBytes(Util.UTF_8), Util.UTF_8); //Funciona bien en FireFox
-				
-			}else if(agente.equals(Util.CHROME)) {
 
-				nom = new String(request.getParameter( CATEGORIA_NOMBRE ).getBytes(Util.ISO_8859_1), Util.UTF_8); //Funciona bien en Chrome
-				desc = new String(request.getParameter(CATEGORIA_DESCRIPCION).getBytes(Util.ISO_8859_1), Util.UTF_8); //Funciona bien en Chrome
-				
-			}else {
-				nom = request.getParameter( CATEGORIA_NOMBRE ).toString();
-				desc = request.getParameter(CATEGORIA_DESCRIPCION).toString();
-			}
-
-		} catch (UnsupportedEncodingException e) {
-			logger.severe(e.getMessage());
+		} catch (Exception e) {
+			LOGGER.severe(e.getMessage());
 			e.printStackTrace();
 		}
 		
 		
-		logger.info("nom:["+nom+"]");
-		logger.info("desc:["+desc+"]");
+		LOGGER.info("nom:["+nom+"]");
+		LOGGER.info("desc:["+desc+"]");
 		
 		
 		
@@ -182,11 +189,12 @@ public class CategoriasServlet extends HttpServlet {
 		em.getTransaction().begin();
 	
 		// Localizamos las categorías
-		logger.info("acciones:operación delete ");
-		String id = request.getParameter("id");
-		logger.info("acciones:operación delete " + id);
+		LOGGER.info("acciones:operación delete ");
+		//String id = request.getParameter("id");
+		String id = Util.getParameterFromBrowser(request, "id");
+		LOGGER.info("acciones:operación delete " + id);
 		long idCategoria = Long.parseLong(id);
-		logger.info("acciones:operación delete " + idCategoria);
+		LOGGER.info("acciones:operación delete " + idCategoria);
 		ret = as.deleteCategoria(idCategoria);
 		
 		em.getTransaction().commit(); // now committed
