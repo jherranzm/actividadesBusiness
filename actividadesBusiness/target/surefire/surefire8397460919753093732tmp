@@ -1,0 +1,33 @@
+#surefire
+#Sat Jul 30 16:35:05 CEST 2011
+testClassesDirectory=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/target/test-classes
+classPathUrl.4=/Users/jherranzm/dev/mavenLocalRepository/mysql/mysql-connector-java/5.1.16/mysql-connector-java-5.1.16.jar
+classPathUrl.3=/Users/jherranzm/dev/mavenLocalRepository/org/eclipse/persistence/javax.persistence/2.0.0/javax.persistence-2.0.0.jar
+classPathUrl.2=/Users/jherranzm/dev/mavenLocalRepository/junit/junit/3.8.1/junit-3.8.1.jar
+useManifestOnlyJar=true
+classPathUrl.1=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/target/classes
+reportsDirectory=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/target/surefire-reports
+classPathUrl.0=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/target/test-classes
+dirscanner.0=directoryScannerOptions
+providerConfiguration=org.apache.maven.surefire.junit.JUnit3Provider
+testSuiteDefinitionTestSourceDirectory=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/src/test/java
+surefireClassPathUrl.1=/Users/jherranzm/dev/mavenLocalRepository/org/apache/maven/surefire/surefire-api/2.7.1/surefire-api-2.7.1.jar
+surefireClassPathUrl.0=/Users/jherranzm/dev/mavenLocalRepository/org/apache/maven/surefire/surefire-junit3/2.7.1/surefire-junit3-2.7.1.jar
+report.2=org.apache.maven.surefire.report.XMLReporter
+useSystemClassLoader=true
+report.1=org.apache.maven.surefire.report.BriefFileReporter
+report.0=org.apache.maven.surefire.report.ForkingConsoleReporter
+excludes0=**/*$*
+isTrimStackTrace=true
+dirscanner.0.params=/Users/jherranzm/dev/EclipseIndigo/workspace20110710/actividadesBusiness/target/test-classes|[**/Test*.java, **/*Test.java, **/*TestCase.java]|[**/*$*]
+includes2=**/*TestCase.java
+enableAssertions=true
+includes1=**/*Test.java
+failIfNoTests=false
+includes0=**/Test*.java
+dirscanner.0.types=java.io.File|java.util.ArrayList|java.util.ArrayList
+classPathUrl.8=/Users/jherranzm/dev/mavenLocalRepository/javax/servlet/servlet-api/2.4/servlet-api-2.4.jar
+classPathUrl.7=/Users/jherranzm/dev/mavenLocalRepository/org/eclipse/persistence/eclipselink/2.0.0/eclipselink-2.0.0.jar
+childDelegation=false
+classPathUrl.6=/Users/jherranzm/dev/mavenLocalRepository/com/google/code/gson/gson/1.4/gson-1.4.jar
+classPathUrl.5=/Users/jherranzm/dev/mavenLocalRepository/org/apache/poi/poi/3.7/poi-3.7.jar
